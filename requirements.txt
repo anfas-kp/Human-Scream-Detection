@@ -1,0 +1,8 @@
+numpy
+librosa
+tensorflow
+matplotlib
+flask
+flask_socketio
+werkzeug
+time

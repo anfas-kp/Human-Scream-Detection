@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scream Detection</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Scream Detection</h1>
+        <p class="subtitle">Real-Time Audio Analysis</p>
+        <button id="themeToggle" aria-label="Toggle theme">🌙 Switch to Dark Mode</button>
+
+        <!-- Real-Time Detection -->
+        <div class="section">
+            <h2>Real-Time Detection</h2>
+            <button id="startBtn">Start Detection</button>
+            <button id="stopBtn" disabled>Stop Detection</button>
+            <div id="status" class="status"></div>
+            <div class="visualization">
+                <h3>Live Waveform</h3>
+                <canvas id="waveformCanvas" width="800" height="200"></canvas>
+            </div>
+            <div id="realtimeResult" class="result">
+                <h2>Prediction: <span id="prediction"></span></h2>
+                <p>Confidence: <span id="confidence"></span></p>
+                <h3>Audio Features:</h3>
+                <ul>
+                    <li>Max Amplitude: <span id="max_amplitude"></span></li>
+                    <li>Mean Amplitude: <span id="mean_amplitude"></span></li>
+                    <li>Standard Deviation: <span id="std_dev"></span></li>
+                </ul>
+                <div id="realtimePlots" class="plots" style="display: none;">
+                    <h3>Scream Detected - Detailed Plots:</h3>
+                    <img id="waveformPlot" src="" alt="Waveform">
+                    <img id="histogramPlot" src="" alt="Histogram">
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Upload -->
+        <div class="section">
+            <h2>Manual Audio Upload</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="file" name="file" accept=".wav,.mp3" required>
+                <button type="submit">Upload & Analyze</button>
+            </form>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            {% if uploaded %}
+                <div id="uploadResult" class="result">
+                    <h2>Prediction: 
+                        <span class="{{ 'scream' if label == 'Scream' else 'not-scream' }}">
+                            {{ label }}
+                        </span>
+                    </h2>
+                    <p>Confidence: {{ confidence }}</p>
+                    <h3>Audio Features:</h3>
+                    <ul>
+                        <li>Max Amplitude: {{ features.max_amplitude }}</li>
+                        <li>Mean Amplitude: {{ features.mean_amplitude }}</li>
+                        <li>Standard Deviation: {{ features.std_dev }}</li>
+                    </ul>
+                    {% if plots %}
+                        <div class="plots">
+                            <h3>Scream Detected - Detailed Plots:</h3>
+                            <img src="{{ url_for('static', filename=plots.waveform) }}" alt="Waveform">
+                            <img src="{{ url_for('static', filename=plots.histogram) }}" alt="Histogram">
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
